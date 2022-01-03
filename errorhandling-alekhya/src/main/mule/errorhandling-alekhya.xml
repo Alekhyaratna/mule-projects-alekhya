@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="83accaf1-8e3f-4aa8-a921-bb830c238e3a" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="errorhandling-alekhyaFlow" doc:id="80a4aff3-3986-4c16-8486-40a3fb23e1db" >
+		<http:listener doc:name="Listener" doc:id="2b70490d-8fe0-4563-8436-a00889c534bd" config-ref="HTTP_Listener_config" path="/error"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="2545eb64-bec3-4583-8422-a772894d3f1d" />
+		<http:request method="GET" doc:name="Request" doc:id="8e0b4ef2-1e5b-4c8f-ac2f-1515dfe01782" url="d.hksgft.m"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="06db913e-6788-4331-b7a7-297bcd88d554" type="HTTP:CONNECTIVITY">
+				<set-payload value='#["this is on error continue"]' doc:name="Set Payload" doc:id="4b143fff-30ef-4657-9a46-2c019600750d" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="errorhandling-alekhyaFlow1" doc:id="e898136d-b14c-417a-b515-132b32b13215" >
+		<http:listener doc:name="Listener" doc:id="aaa0e512-2ceb-4a3f-9b86-328e70c03833" config-ref="HTTP_Listener_config" path="/error2">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["error handled inside the default error handler"]' doc:name="Set Payload" doc:id="2be8c1f6-585d-4004-bcac-61adac93ef6f" />
+		<http:request method="GET" doc:name="Request" doc:id="b4782d5a-1538-4226-be36-5fca41fa579b" url="ggff.hudshuiha"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="94cd3f62-d88c-4b0a-b74c-eb912f54900e" type="ANY">
+				<set-payload value='#["error handled inside the custom connectivity issues handler"]' doc:name="Set Payload" doc:id="4ba27c49-e95e-4d08-9e0e-2392304e94bf" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="errorhandling-alekhyaFlow2" doc:id="b9ec9816-b434-4e3b-9912-c2a435fc1345" >
+		<http:listener doc:name="Listener" doc:id="31051143-4bae-44fb-9565-21684852ec60" config-ref="HTTP_Listener_config" path="/error3">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<flow-ref doc:name="Flow Reference" doc:id="7759244c-5ae2-47d7-a6c7-523e63b4df72" name="errorhandling-alekhyaprivateFlow3"/>
+		<set-payload value='"payload after flow ref"' doc:name="Set Payload" doc:id="17728719-86af-4b24-8712-ac5460b35798" />
+	</flow>
+	<flow name="errorhandling-alekhyaprivateFlow3" doc:id="0a97c05b-96f0-477d-80f6-536777d17abf" >
+		<http:request method="GET" doc:name="Request" doc:id="96e3c301-46dd-441b-9d99-064870188628" url="jyihm.m"/>
+		<set-payload value='#["after error handling in custom handeller"]' doc:name="Set Payload" doc:id="900d0d13-f9d8-4f59-8a14-443310654594" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="99919c88-df2e-4026-b2cc-0b6f047ce9b3" type="HTTP:CONNECTIVITY">
+				<set-payload value="Error handelled in ON ERROR PROPAGATE" doc:name="Set Payload" doc:id="3d560d78-8af0-4506-afe1-baa42147ab9b" />
+				<ee:transform doc:name="Transform Message" doc:id="a84cc627-8935-4154-b53a-5304cd2652b2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"error": error.description]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="continue-alekhyaFlow" doc:id="c252cafc-df97-42d9-94fc-139209dd92d7" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="cb50112b-f51c-4cf1-beba-6a8f8cbf061d" config-ref="HTTP_Listener_config" path="/error4" >
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<flow-ref doc:name="Copy_of_Flow Reference" doc:id="464eb089-c703-4071-b44e-85bf51a20782" name="continue-alekhyaprivateFlow" />
+		<set-payload value='#["payload after flow ref"]' doc:name="Copy_of_Set Payload" doc:id="8bcef51e-4cd4-4c19-a32e-4ed659b010f6" />
+	</flow>
+	<flow name="continue-alekhyaprivateFlow" doc:id="bc3cdb27-4b13-47fe-9e21-e4ad8fb65113" >
+		<http:request method="GET" doc:name="Copy_of_Request" doc:id="6d4946bd-e9cb-4049-8d9e-f12fcbdefd17" url="asdfhgjk.m"/>
+		<set-payload value='#["after error handling in custom handeller"]' doc:name="Copy_of_Set Payload" doc:id="73ed0df1-85da-4967-b107-cc98718e2f00" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="82f61a3c-3b4f-4396-b49e-647d5b00c281" type="HTTP:CONNECTIVITY">
+				<set-payload value='#["Error handelled in ON ERROR CONTINUE"]' doc:name="Copy_of_Set Payload" doc:id="d42613fe-a756-4333-8898-0f07006b193f" />
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="b6190c88-0c1c-4db7-869f-431bbf7909c1">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+"error": error.description]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="844cc057-eda3-4d9e-b4d6-f33e400e500c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration doc:name="Configuration" doc:id="cad84c6c-bd9e-4d0d-ae70-6b574c0ef4cd" defaultErrorHandler-ref="global_error_handler" />
+	<flow name="raiseerror-31-12-alekhyaFlow" doc:id="96f5adfe-48e8-40de-8fdd-01ca684c9281" >
+		<http:listener doc:name="Listener" doc:id="daef1101-e9a1-444c-8033-f2994c92152e" config-ref="HTTP_Listener_config" path="/raiseerror">
+			<http:error-response >
+				<http:body ><![CDATA[#[PAYLOAD]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Hello ALEKHYA"]' doc:name="Set Payload" doc:id="62dcb44e-e335-4229-9b39-05a863be1f71" />
+		<choice doc:name="Choice" doc:id="f20d29ca-ccb7-4455-851d-cecfe8b4c6d3" >
+			<when expression="#[isEmpty(payload)]">
+				<raise-error doc:name="Raise error" doc:id="9797c96b-1ee6-4d46-9550-1a4c9347e3c6" type="NO:PAYLOAD" description="payload is empty"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="939b748d-aff9-4c96-9222-383f5c4394f0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d2b88c97-aa6a-4527-bfb5-32c6eddfa95c" type="NO:PAYLOAD">
+				<ee:transform doc:name="Transform Message" doc:id="05bf3b9a-96a4-45cf-9b78-c0b4b5a07958">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/jSON
+---
+"payload is empty in error continue"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="raiseerror-31-12-alekhyaFlow1" doc:id="af7f7edb-c511-44c8-aef7-4601cc3d8be6" >
+		<http:listener doc:name="Listener" doc:id="f006a27a-b15e-4ab4-92e2-3abe244ad2c3" config-ref="HTTP_Listener_config" path="/try">
+		</http:listener>
+		<set-payload value="#[121]" doc:name="Set Payload" doc:id="20fa8825-15c7-438d-be35-a52ca3cbe950" />
+		<try doc:name="Try" doc:id="9bf046a8-a359-4393-98ff-27490e1654a5" >
+			<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="f451677a-6e3d-44af-965c-c632e7c04ff3" value="#[payload]" minValue="123" maxValue="11324"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5e3d5179-aa2f-4aed-8589-0c75fc9a93f7" type="VALIDATION:INVALID_NUMBER">
+					<set-payload value='#["invalid number"]' doc:name="Set Payload" doc:id="2cb27a1e-5d7e-4962-91f2-ee2088c587d9" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="c2348cae-93c8-46b4-9af7-f96d515f4b63" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="raiseerror-31-12-alekhyaFlow2" doc:id="d4e2f531-39ac-4748-97a9-8f27d76238d6" >
+		<http:listener doc:name="Listener" doc:id="9da4922d-53cf-4727-b4ed-73097c8ff10b" config-ref="HTTP_Listener_config" path="/subflow">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<flow-ref doc:name="Flow Reference" doc:id="46698f25-0137-41a2-bf64-05e355cc3677" name="raiseerror-31-12-alekhyaSub_Flow"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="468fe151-f3f2-4d3c-a7c6-a29b5aa5e860" />
+	</flow>
+	<sub-flow name="raiseerror-31-12-alekhyaSub_Flow" doc:id="18dc65ac-fb14-4169-9f05-9463d3612773" >
+		<try doc:name="Try" doc:id="ab8575bf-5449-4208-8430-cd3bf79151af" >
+			<http:request method="GET" doc:name="Request" doc:id="72b680dc-f1a5-42c2-939c-7aa3906b6b9c" url="asdfghjkl.gfd"/>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f8831530-029a-4e65-93eb-2d1c612921dc" type="ANY">
+					<ee:transform doc:name="Transform Message" doc:id="d2b8a2fd-7e8e-44a4-a49e-45268136a851" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"error handelled in subflow error propagte"]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<flow name="Global_error_is_number_handeller" doc:id="1e7dd145-ff9f-4325-a439-17ab9c0d6d7a" >
+		<http:listener doc:name="Listener" doc:id="1626740e-9f21-4d9f-a8b6-f6057ed34198" config-ref="HTTP_Listener_config" path="/global"/>
+		<set-payload value='#["alekhya"]' doc:name="Set Payload" doc:id="c7559e00-6ed9-4504-b734-f563b7c8869b" />
+		<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="d86ec130-c1bf-4e99-b5c7-48b9f0fb6a61" value="#[payload]"/>
+	</flow>
+	<error-handler name="global_error_handler" doc:id="af393906-5f96-4916-80fc-28e4b58c697f" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e4f08a1b-5fb0-4ba4-b552-0b71719d7ed8" type="VALIDATION:INVALID_NUMBER">
+			<ee:transform doc:name="Transform Message" doc:id="8398d7db-5a55-4259-9c33-abc178c0be5e" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"invalid number"]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+	</error-handler>
+</mule>

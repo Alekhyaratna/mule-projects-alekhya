@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="assessment-4-3-alekhya-suite.xml" />
+	<munit:test name="assessment-4-3-alekhyaFlow-test-select" doc:id="e4c74d4a-381f-4c41-8af6-22c9f1f6b39c" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="cc8012eb-7208-4cd6-91fe-827e8cec2a85" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ebdaa3a1-5aee-4d8c-8d13-60bb60eebeae" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://assessment43alekhyaFlowtestselect\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="a058b313-3761-42fc-b0c4-ab4cfc747d51" >
+				<munit:payload value="#[readUrl('classpath://assessment43alekhyaFlowtestselect\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://assessment43alekhyaFlowtestselect\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to assessment-4-3-alekhyaFlow" doc:id="ea991202-bf8d-40d9-91e8-9b54d46b2371" name="assessment-4-3-alekhyaFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="a88b96b7-2b6b-41b7-bd82-749f331dc834" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import assessment43alekhyaFlowtestselect::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="assessment-4-3-alekhyaFlow1-test-insert" doc:id="a1c5623e-aeab-479d-a040-6a5809b3ba16" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Insert" doc:id="0d55db68-3622-4d13-a9fd-f7826d1e4069" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="2e59c5c0-5750-4814-8085-3174a7212671" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://assessment43alekhyaFlow1testinsert\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="7a1a3fdd-22ff-4388-8522-ebef6a320bf2" >
+				<munit:payload value="#[readUrl('classpath://assessment43alekhyaFlow1testinsert\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://assessment43alekhyaFlow1testinsert\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to assessment-4-3-alekhyaFlow1" doc:id="5c1b6307-09e7-472d-b889-d578451ffde3" name="assessment-4-3-alekhyaFlow1"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="28503964-40c2-4a0d-b42c-8933097dd5e0" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import assessment43alekhyaFlow1testinsert::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

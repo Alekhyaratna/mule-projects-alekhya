@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f16e7d74-7ff2-4260-afbd-bbff93a2805b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="assessment-dwl-29-12-alekhyaFlow" doc:id="3f85bdfe-c0b8-41db-9022-20a8e9ffbdee" >
+		<http:listener doc:name="Listener" doc:id="feccd4b8-8f81-478b-9ed3-0906d14bc50e" config-ref="HTTP_Listener_config" path="/assessment"/>
+		<http:request method="GET" doc:name="Request" doc:id="ad8aa96e-dd2f-46c8-8fb5-70971088fe5b" url="https://api.github.com/users"/>
+		<ee:transform doc:name="Transform Message" doc:id="73df2e0b-2c7b-4185-863c-df7ade73c05c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+    "loginname":$.login,
+    "loginId":$.id
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2d3b6967-6d18-4008-bcb9-b79164e31ac2" message="#[payload]"/>
+	</flow>
+</mule>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="807a20f4-0a9e-408a-9042-432f22942f93" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration doc:name="Configuration" doc:id="1177be24-c26b-4053-9d16-9b7dcf8afc84" defaultErrorHandler-ref="global-error-handlerError_Handler" />
+	<flow name="assessment-4-alekhyaFlow" doc:id="9cea7735-3ced-402a-9571-e40687d790ef" >
+		<http:listener doc:name="Listener" doc:id="fa78caec-dd66-4fa2-a9eb-9d209961917f" config-ref="HTTP_Listener_config" path="/raiseerror">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<choice doc:name="Choice" doc:id="6c1833fb-9782-4514-ab11-9976e6270b09" >
+			<when expression="#[isEmpty(payload)]">
+				<raise-error doc:name="Raise error" doc:id="5fdda86a-3cc2-45c4-b0a1-42a649a2eafe" type="NO:PAYLOAD" description="payload is empty"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="be0bd9a5-b8f8-4e61-beaa-479bd5f19c8f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

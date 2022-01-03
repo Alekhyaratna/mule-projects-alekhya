@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a6b6c48d-2850-45af-9256-d818c8c0c7eb" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="591c872d-9695-4d19-b9d1-c322ce697d9a" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="customer_details" />
+	</db:config>
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="923b40f2-c01c-487f-9edb-88fbdc42004d" >
+		<wsc:connection wsdlLocation="http://calculator-webservice.mybluemix.net/calculator?wsdl" service="CalculatorService" port="CalculatorPort" address="http://calculator-webservice.mybluemix.net/calculator" />
+	</wsc:config>
+	<flow name="hassignment-alekhyaFlow" doc:id="b535dc4b-84bc-4f6c-aa59-a03467afcb2c" >
+		<http:listener doc:name="Listener" doc:id="28449d12-1f09-48c8-bf91-7a2cdfb4e493" config-ref="HTTP_Listener_config" path="/dbselect"/>
+		<db:select doc:name="Select" doc:id="be5d1f7d-7eda-4cdc-855a-60364e28e1df" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from customer_details.customer_details1]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="30e0a4eb-3d0e-48a3-9244-227a3101deb3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="732d7cf8-ff59-44e8-8914-e13d0d8faa68" message="#[payload]"/>
+	</flow>
+	<flow name="hassignment-alekhyaFlow1" doc:id="835b0c08-835b-4a38-a0df-0114c3521ab9" >
+		<http:listener doc:name="Listener" doc:id="261bf43a-dc4f-4fc1-a69b-f2564861d22f" config-ref="HTTP_Listener_config" path="/dbinsert"/>
+		<db:insert doc:name="Insert" doc:id="ddeac4c4-b4bb-4e3e-9a15-d0b25d568e69" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into customer_details.customer_details1 (customer_id,customer_name,DOB,city,Gender) values (2,"Akhila","2000-11-19","chennur","F")]]></db:sql>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="4e7fb9af-bd52-49b9-a80b-91dabc03d734" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6eeb890c-cce8-4d44-a901-6c812d74e115" message="#[payload]"/>
+	</flow>
+	<flow name="hassignment-alekhyaFlow2" doc:id="5bc09705-0c41-4eb5-af69-7343619a59e2" >
+		<http:listener doc:name="Listener" doc:id="833e0bd7-31d3-4ffa-9ce3-af92c8aeea14" config-ref="HTTP_Listener_config" path="/dbupdate"/>
+		<db:update doc:name="Update" doc:id="a989f2d5-46e7-40b9-b081-c11e0bc3692d" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE customer_details.customer_details1
+SET city = "Chennur"
+WHERE customer_id = 1]]></db:sql>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="391ec2f1-1fb4-480d-ae29-5215c189f54a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="2f368ab8-1eee-41c3-a3e3-d133e9690f6a" message="#[payload]"/>
+	</flow>
+	<flow name="hassignment-alekhyaFlow3" doc:id="f246240c-8584-49e3-87da-e29747ad5333" >
+		<http:listener doc:name="Listener" doc:id="dcdca4f8-88d7-4782-9879-1b873da36dc5" config-ref="HTTP_Listener_config" path="/dbdelete"/>
+		<db:delete doc:name="Delete" doc:id="cacd69b5-5b93-4064-9ccf-725b0b3c8397" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from customer_details.customer_details1 where customer_id = 2]]></db:sql>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="c4815d1c-8555-473a-aecd-fb16d3114d45" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="39f1ad8d-2b3e-43cf-ab78-40083f762841" message="#[payload]"/>
+	</flow>
+	<flow name="hassignment-alekhyaFlow4" doc:id="d2e65be8-afc1-43ad-894a-21d4fa6f6a41" >
+		<http:listener doc:name="Listener" doc:id="6021c458-2ab2-4ebe-b83a-ff758d74b8e0" config-ref="HTTP_Listener_config" path="/wsdl"/>
+		<ee:transform doc:name="Transform Message" doc:id="6279fdde-ad17-4f5f-8842-1787b8e46057" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://example.com/
+---
+{
+	ns0#add: {
+		intA: attributes.queryParams.number1,
+		intB: attributes.queryParams.number2
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="add" doc:name="Consume" doc:id="d28181e3-27be-430f-b9a7-e29014c9b986" config-ref="Web_Service_Consumer_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="ba762e86-7a2c-4502-87d8-1064ee7e5214" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0ns ns0 http://example.com/
+
+output application/json
+---
+"addition of two numbers": payload.body.ns0#addResponse.value]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

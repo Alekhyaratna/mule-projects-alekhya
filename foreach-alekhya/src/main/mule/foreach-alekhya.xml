@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="447bab0f-c0a4-4891-aedd-d46eeb87b1ea" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="foreach-alekhyaFlow" doc:id="f2737ba3-eac7-4430-9338-3f4332b7092c" >
+		<http:listener doc:name="Listener" doc:id="b75a157b-3098-4651-969b-a785747b5374" config-ref="HTTP_Listener_config" path="/foreach"/>
+		<set-payload doc:name="Set Payload" doc:id="5e327fb7-1d36-41ee-8956-6c7f65a4aff8" value='[1,2,"raju",3,4,"alekhya",5,6]'/>
+		<foreach doc:name="For Each" doc:id="cf9c258c-22a4-464c-b819-36b2b297e552" >
+			<set-payload value="#[payload + 2]" doc:name="Set Payload" doc:id="1b510606-cb16-49dd-8586-5cc9ec2302b5" />
+		</foreach>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="ab95d5e2-55c9-4ef5-b58c-b338cd3ceac0" />
+		<ee:transform doc:name="Transform Message" doc:id="56e651f6-fd5c-407a-a6c3-6534cb108748" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="foreach-alekhyaFlow1" doc:id="bc2e5c34-f56c-4eba-9d60-b9a7dbe2c90b" >
+		<http:listener doc:name="Listener" doc:id="37ef2493-685b-4461-8c1c-24ae1244b90b" config-ref="HTTP_Listener_config" path="/batch"/>
+		<batch:job jobName="foreach-alekhyaBatch_Job" doc:id="5ad1fe74-2e39-40e5-9005-7a0845ba862c" maxFailedRecords="2">
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="36ae8953-8686-4f2f-954b-68d7573ac41f" acceptExpression="#[payload as String]">
+					<set-payload value="#[payload]" doc:name="Set Payload" doc:id="1e30b761-931c-49ec-aa15-ecd242975ff5" />
+					<logger level="INFO" doc:name="Logger" doc:id="d183af58-835f-468f-a107-56e4b6b4addf" message="#[payload]"/>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="ba8cba96-17a7-4c24-a61d-adddfa0c88b8" streaming="true">
+						<logger level="INFO" doc:name="Logger" doc:id="d991fb95-8c1e-46fa-a570-4dee96f5524a" message="#[payload]"/>
+					</batch:aggregator>
+				</batch:step>
+				<batch:step name="Batch_Step1" doc:id="a5c90fd8-bfd3-492c-a928-db3e6984ec0f">
+					<set-payload value="#[payload]" doc:name="Set Payload" doc:id="4fbacd9d-f87a-400b-9362-4fb19ee99abc" />
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="2ba9b6e1-1093-4699-80f8-9d005bbac99b" streaming="true">
+						<logger level="INFO" doc:name="Logger" doc:id="3d21cb17-f09a-48c6-a719-660494810008" message="#[payload]"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="29d6ea5d-d032-4fbd-b133-14e2d3c36746" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+</mule>

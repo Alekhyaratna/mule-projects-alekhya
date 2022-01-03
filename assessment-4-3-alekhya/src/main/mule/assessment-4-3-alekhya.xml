@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="20d09eae-4316-4eb7-8588-22772df1b34d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="247fbbf3-2a21-427a-b715-9d22cb9c584f" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="learndb" />
+	</db:config>
+	<flow name="assessment-4-3-alekhyaFlow" doc:id="359bc771-3d3e-496d-a01d-222589299ef8" >
+		<http:listener doc:name="Listener" doc:id="94bd47ab-d817-485d-9db5-51e034d05d27" config-ref="HTTP_Listener_config" path="/dbselect"/>
+		<db:select doc:name="Select" doc:id="ebdaa3a1-5aee-4d8c-8d13-60bb60eebeae" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from learndb.account_holders]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="9f46e05b-5f87-469b-88d2-0dccc2f84e54" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="122d165d-4638-476c-ac28-56c6aac39497" message="#[payload]"/>
+	</flow>
+	<flow name="assessment-4-3-alekhyaFlow1" doc:id="1b21b9bf-4054-4760-839c-7cc75263695f" >
+		<http:listener doc:name="Listener" doc:id="a496bf12-0b9c-446f-a31f-ebcf3b752cc9" config-ref="HTTP_Listener_config" path="/dbinsert"/>
+		<db:insert doc:name="Insert" doc:id="2e59c5c0-5750-4814-8085-3174a7212671" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into learndb.account_holders (account_no,account_name,Mobile_no,Address) values (103,"Raju",7075067345,"odf colony,ameenpur")]]></db:sql>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="5fbebf0a-c0b2-46c0-9801-3b60b9c27e99">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e93f1409-a3c3-4cc9-9342-e75f5c6106d1" message="#[payload]"/>
+	</flow>
+</mule>

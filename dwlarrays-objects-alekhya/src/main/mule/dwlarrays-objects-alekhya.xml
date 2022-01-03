@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1a965fa6-73e1-475b-9b0b-6b9d78b26327" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="usingmap--$$" doc:id="090a1953-8ccd-4539-9d27-e738279f3ef3" >
+		<http:listener doc:name="Listener" doc:id="bf2d3646-50e7-4ac0-8dee-84fbf05a6606" config-ref="HTTP_Listener_config" path="/mapobjects"/>
+		<ee:transform doc:name="Transform Message" doc:id="0d18492f-827c-42c0-bab3-315cce41afa5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+"candidatedetails":	payload.employee map 
+{
+	"fname" :($.FirstName) ++" "++ ($.LastName)}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="map-book" doc:id="654f869a-2160-40d5-8b22-26a7a0191d0a" >
+		<http:listener doc:name="Listener" doc:id="4f6c8a10-0997-4dba-8e5d-634d4ea5dea8" config-ref="HTTP_Listener_config" path="/mapBook"/>
+		<ee:transform doc:name="Transform Message" doc:id="9a1b6a55-4085-4527-9ea0-c0317f8ac104" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+   output application/json
+   ---
+   payload.myns.bookstore.*book map
+  {
+    title: $.title,
+    author: $.author,
+    year: $.year,
+    price:$.price,
+    category:$.@category
+  }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="foo-bar-java" doc:id="e30bb18c-0ece-42a7-95fb-97e20ecc78f9" >
+		<http:listener doc:name="Listener" doc:id="d17c17cc-da4b-467e-938f-689e7db419ba" config-ref="HTTP_Listener_config" path="/foobarjava"/>
+		<ee:transform doc:name="Transform Message" doc:id="7225c1a3-aa48-4f2a-8112-82942f41b159" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload groupBy (item) -> item.language]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="groupby-labels" doc:id="df6f5bac-e682-4781-99b9-42ae79947cb7" >
+		<http:listener doc:name="Listener" doc:id="cf2a9f89-f2d0-44c1-b7d6-be9bbed43323" config-ref="HTTP_Listener_config" path="/labels"/>
+		<ee:transform doc:name="Transform Message" doc:id="2ed14be9-8ee9-4ddf-8840-b967630667eb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var myVar = { menu: {
+    header: "Move Items",
+    items: [
+        {"id": "internal"},
+        {"id": "left", "label": "Move Left"},
+        {"id": "right", "label": "Move Right"},
+        {"id": "up", "label": "Move Up"},
+        {"id": "down", "label": "Move Down"}
+    ]
+}}
+---
+{
+    mylabels:myVar.menu.items.label
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mapObject-pets" doc:id="436f19a1-2d8d-4d9a-beea-d7243af8cce5" >
+		<http:listener doc:name="Listener" doc:id="5ca50748-e255-45ef-9da4-d22f9f0f1d82" config-ref="HTTP_Listener_config" path="pets"/>
+		<ee:transform doc:name="Transform Message" doc:id="de6a3d42-14de-4951-b9bd-90ffd6e157fe" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[ %dw 2.0
+output application/json
+---
+payload mapObject ((value, key, index) -> {
+    "element":{
+        "index":index,
+        "key":key,
+        "value": value
+    }})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwlarrays-objects-alekhyaFlow" doc:id="d65352b9-e5e5-4ef8-b60e-77dc0d5de51f" >
+		<http:listener doc:name="Listener" doc:id="a0cf44e7-690d-4936-a051-4a9a3b41b398" config-ref="HTTP_Listener_config" path="/sum"/>
+		<ee:transform doc:name="Transform Message" doc:id="644b91c2-6d7a-4b12-90bc-6d1ee67eed67" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+    prices: payload.prices mapObject (value, key) -> {
+        (key): (value + 5) as Number 
+    }
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="numbers" doc:id="f00a14fb-9b6c-493d-8423-916cd89eb98a" >
+		<http:listener doc:name="Listener" doc:id="b4deb5e2-176f-4e91-9f53-47dfaf130122" config-ref="HTTP_Listener_config" path="/numbers"/>
+		<ee:transform doc:name="Transform Message" doc:id="c67966a6-5258-475d-9800-2a598a8db940" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+    "value":$+1,
+    "index":$$
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

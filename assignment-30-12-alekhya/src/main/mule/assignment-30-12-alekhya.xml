@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="assignment-30-12-alekhyaFlow" doc:id="da2dc928-d3e8-4e30-b677-4990609763cb" >
+		<http:listener doc:name="Listener" doc:id="c5bc266a-4d81-4a62-94cb-ea6150849fb0" />
+		<flow-ref doc:name="Flow Reference" doc:id="53fccd6a-3554-4906-985a-9cbb1791e33f" />
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="c7b606a7-8b0d-4fb0-922b-60a2703891c3" />
+	</flow>
+	<flow name="assignment-30-12-alekhyaFlow1" doc:id="894cfb96-8f7f-4244-9bab-ac90927a0d41" >
+		<http:request method="GET" doc:name="Request" doc:id="e85126c6-4bd4-40bc-9ae6-883224c93e6e" />
+	</flow>
+</mule>

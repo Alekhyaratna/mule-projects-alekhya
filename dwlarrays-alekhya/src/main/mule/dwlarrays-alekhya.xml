@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="79a828ca-55ed-45be-b796-456e3a494318" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dwlarrays-alekhyaFlow" doc:id="b1dea1b1-206a-43f4-ba7c-22cca7ff7790" >
+		<http:listener doc:name="Listener" doc:id="a5a0b8de-cece-48e8-8e5a-3d006474a7e8" config-ref="HTTP_Listener_config" path="/dwlarrays"/>
+		<ee:transform doc:name="Transform Message" doc:id="d1185c0e-083f-4a10-846a-ff8792f5bb49" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload filter $.age >30 map ((item, index) -> {
+    "firstname": item.firstname,
+    "occupation":item.occupation
+} )  
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwlarrays-alekhyaFlow1" doc:id="cd07d677-1853-4e0f-ab39-f024d14ac8eb" >
+		<http:listener doc:name="Listener" doc:id="c1a445ba-eb44-4cfd-b1a1-a098c291173f" config-ref="HTTP_Listener_config" path="/dwlarrays2"/>
+		<ee:transform doc:name="Transform Message" doc:id="66fd093f-3af4-4ef6-aa73-b946217360d2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload groupBy ((item, index) -> item.acc_type)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwlarrays-alekhyaFlow2" doc:id="31adc00f-6269-44bb-8b2f-761eb348bdc3" >
+		<http:listener doc:name="Listener" doc:id="6400313c-f268-4fbd-9547-62e462f3684c" config-ref="HTTP_Listener_config" path="/dwlarrays3"/>
+		<ee:transform doc:name="Transform Message" doc:id="18bbae39-b990-4807-b7a7-30fb5d753ef1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload filterObject ((value, key, index) -> 
+value != null)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwlarrays-alekhyaFlow3" doc:id="ce67b9a1-becb-4b7f-9df7-9ad2b1491eee" >
+		<http:listener doc:name="Listener" doc:id="a98af92f-6683-4100-842c-bb8388c8efa5" config-ref="HTTP_Listener_config" path="dwlasssessmentarray"/>
+		<ee:transform doc:name="Transform Message" doc:id="16633508-21a5-4073-8e2f-2c7033d30486" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var myVar = { menu: {
+    header: "Move Items",
+    items: [
+        {"id": "internal"},
+        {"id": "left", "label": "Move Left"},
+        {"id": "right", "label": "Move Right"},
+        {"id": "up", "label": "Move Up"},
+        {"id": "down", "label": "Move Down"}
+    ]
+}}
+---
+{
+    mylabels:myVar.menu.items.label
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="dwlarrays-alekhyaFlow4" doc:id="fb5d65da-22ea-4776-96dd-6a1187dcb265" >
+		<http:listener doc:name="Listener" doc:id="792c4711-e9eb-4621-8732-ed14689a608a" config-ref="HTTP_Listener_config" path="/dwlmapobject"/>
+		<ee:transform doc:name="Transform Message" doc:id="e5f4d7f0-a47d-4fc4-a017-0a79b64bad82" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload mapObject ((value, key, index) -> {
+    "element":{
+        "index":index,
+        "key":key,
+        "value": value
+    }
+} )]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

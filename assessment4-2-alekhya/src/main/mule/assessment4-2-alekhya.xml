@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1920c2cc-6be4-44ca-a671-01da3a51b299" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="assessment4-2-alekhyaFlow" doc:id="9fe33487-65be-4c88-8678-d8ec8348c626" >
+		<http:listener doc:name="Listener" doc:id="30770b8c-eaf1-4e59-adc1-2da8bb48be01" config-ref="HTTP_Listener_config" path="/connectivity">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<flow-ref doc:name="Flow Reference for subflow" doc:id="79bff604-5d16-470d-85fe-80fbdafd5e2f" name="assessment4-2-alekhyaSub_Flow"/>
+		<set-payload value="#[payload]" doc:name="Set Payload to display if success" doc:id="0e6626f1-8073-4646-9d24-1f3694bf1039" />
+	</flow>
+	<sub-flow name="assessment4-2-alekhyaSub_Flow" doc:id="2b9b1466-55b5-4525-b4bd-386707cf5fd7" >
+		<try doc:name="Try" doc:id="4ec133d1-6bab-4995-af2a-ce33afe944f1" >
+			<http:request method="GET" doc:name="Request" doc:id="a277c662-9fc0-4ccb-90cf-1bed0f5d11a3" url="www.google.a" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a527ec5c-4990-4b12-8f01-b519e7266816" type="HTTP:CONNECTIVITY">
+					<ee:transform doc:name="Transform Message" doc:id="629c7810-7fea-4d26-847f-3476f85d3eaf" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Error handled in Subflow ON ERROR CONTINUE"]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+</mule>

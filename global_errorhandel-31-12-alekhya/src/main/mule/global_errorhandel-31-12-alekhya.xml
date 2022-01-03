@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c321183b-7a13-4800-82ae-94426da99aef" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration doc:name="Configuration" doc:id="f4ad38be-f716-4eb3-8e00-d6b78b40532a" defaultErrorHandler-ref="Copy_of_global_error_handler" />
+	<flow name="raise_error_1" doc:id="85716b34-f27c-4a1c-a25f-724b5431b85c" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="3f830366-c83a-4d0a-a437-82c56e879e2b" config-ref="HTTP_Listener_config" path="/raiseerror1" >
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<choice doc:name="Copy_of_Choice" doc:id="61705489-3207-48a5-8cea-c212df24d8f9" >
+			<when expression="#[isEmpty(payload)]" >
+				<raise-error doc:name="Copy_of_Raise error" doc:id="4f1ba60c-49c6-43bf-9109-3b2faeaed024" type="NO:PAYLOAD" description="payload is empty" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Copy_of_Transform Message" doc:id="667de337-c8d8-4327-aab6-5a41dcf65cbe" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="isnumber_error-2" doc:id="773114b0-9c0f-4636-b5b1-421c860e40ab" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="5c0a5d1d-76ef-4543-bf8c-bfc01191b14d" config-ref="HTTP_Listener_config" path="/global2" />
+		<set-payload value='#["alekhya"]' doc:name="Copy_of_Set Payload" doc:id="da7419f9-1044-4869-b208-02f3739e13ad" />
+		<validation:is-number numberType="INTEGER" doc:id="256dc5d2-131b-428a-8aa9-d4550d8377f6" value="#[payload]" doc:name="Copy_of_Is number" />
+	</flow>
+	<error-handler name="Copy_of_global_error_handler" doc:id="7cf55fda-40f5-4671-9922-43d51b0b68f6" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="Copy_of_On Error Continue" doc:id="6f54f4bc-ca4f-4eba-a0a6-62f43cc9dfa8" type="VALIDATION:INVALID_NUMBER" >
+			<ee:transform doc:name="Copy_of_Transform Message" doc:id="826f79b8-1354-4002-bc29-45ee75fffd48" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"invalid number"]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5c71d361-d7f0-4e96-bb36-2faf59edf05e" type="NO:PAYLOAD">
+			<ee:transform doc:name="Transform Message" doc:id="095c3095-a641-4644-863e-b94dda3c0877" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"this is global error handeler"]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>
